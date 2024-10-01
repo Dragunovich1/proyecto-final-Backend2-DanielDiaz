@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Producto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
+    <style>
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            max-width: 800px;
+            margin-top: 30px;
+        }
+        .message {
+            background-color: #dff0d8;
+            color: #3c763d;
+            padding: 1rem;
+            border: 1px solid #d6e9c6;
+            border-radius: 3px;
+            margin-bottom: 1rem;
+        }
+        .product-details {
+            background-color: #f8f8f8;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .action-button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 3px;
+            border: none;
+            text-align: center;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+        .action-button:hover {
+            background-color: #555;
+        }
+        .action-button:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Editar Producto</h1>
+        <form id="edit-product-form">
+            <input type="hidden" id="product-id" value="{{product._id}}">
+            <input type="text" id="name" value="{{product.name}}" placeholder="Nombre" required>
+            <input type="text" id="description" value="{{product.description}}" placeholder="Descripción" required>
+            <input type="text" id="category" value="{{product.category}}" placeholder="Categoría" required>
+            <input type="number" id="price" value="{{product.price}}" placeholder="Precio" required>
+            <input type="number" id="stock" value="{{product.stock}}" placeholder="Stock" required>
+            <button type="submit" class="action-button">Guardar cambios</button>
+            <button type="button" class="action-button" onclick="window.location.href='/realtimeproducts'">Volver</button>
+        </form>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="message">
+                Cambios realizados exitosamente.
+            </div>
+            <div class="product-details">
+                <pre id="product-json"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('edit-product-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const productId = document.getElementById('product-id').value;
+            const updatedProduct = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                category: document.getElementById('category').value,
+                price: parseFloat(document.getElementById('price').value),
+                stock: parseInt(document.getElementById('stock').value),
+            };
+
+            fetch(`/api/products/${productId}`, { // Use backticks for template string
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedProduct),
+            }).then(response => response.json())
+              .then(data => {
+                  // Mostrar el modal con el mensaje de éxito
+                  const modal = document.getElementById('myModal');
+                  const modalContent = document.getElementById('product-json');
+                  modalContent.textContent = JSON.stringify(data, null, 2);
+                  modal.style.display = 'block';
+              });
+        });
+
+        // Lógica para cerrar el modal
+        const modal = document.getElementById('myModal');
+        const span = document.getElementsByClassName('close')[0];
+
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

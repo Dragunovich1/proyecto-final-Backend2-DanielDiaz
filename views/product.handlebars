@@ -1,0 +1,24 @@
+{{!-- product.handlebars --}}
+<h2>{{product.name}}</h2>
+<p>{{product.description}}</p>
+<p>Precio: ${{product.price}}</p>
+<p>Categoría: {{product.category}}</p>
+<p>Stock: {{product.stock}}</p>
+<form action="/api/carts/{{cartId}}/product/{{product._id}}" method="POST">
+    <a href="#" onclick="this.closest('form').submit()" class="action-link">Agregar al carrito</a>
+</form>
+
+<style>
+    .action-link {
+        padding: 0.5rem 1rem;
+        background-color: #333;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 3px;
+        text-align: center;
+        cursor: pointer;
+    }
+    .action-link:hover {
+        background-color: #555;
+    }
+</style>

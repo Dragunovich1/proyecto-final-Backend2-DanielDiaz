@@ -1,0 +1,156 @@
+{{!-- realTimeProducts.handlebars --}}
+{{#> layout showDashboardLink=true cartId=cartId}}
+    <h2>{{title}}</h2>
+    <ul class="product-list" id="products-list">
+        {{#each products}}
+            <li class="product-item">
+                <span>{{this.name}} - ${{this.price}}</span>
+                <div class="product-actions">
+                    <a href="#" class="action-link" onclick="deleteProduct('{{this._id}}'); return false;">Eliminar</a>
+                    <a href="/products/{{this._id}}/edit" class="action-link">Modificar</a>
+                </div>
+            </li>
+        {{/each}}
+    </ul>
+
+    <h2>Agregar productos</h2>
+    <form id="product-form" onsubmit="addProduct(event)">
+        <input type="text" id="name" placeholder="Nombre" required>
+        <input type="text" id="description" placeholder="Descripción" required>
+        <input type="text" id="category" placeholder="Categoría" required>
+        <input type="number" id="price" placeholder="Precio" required min="0">
+        <input type="number" id="stock" placeholder="Stock" required min="1">
+        <button type="submit" class="styled-button">Agregar producto</button>
+    </form>
+
+    <style>
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .action-link {
+            padding: 0.5rem 1rem;
+            background-color: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 3px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .action-link:hover {
+            background-color: #555;
+        }
+        .styled-button {
+            padding: 0.5rem 1rem;
+            background-color: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 3px;
+            border: none;
+            text-align: center;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+        }
+        .styled-button:hover {
+            background-color: #555;
+        }
+    </style>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket;
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            socket = io();
+
+            socket.on('connect', () => {
+                console.log('Conectado al servidor WebSocket');
+            });
+
+            socket.on('disconnect', () => {
+                console.log('Desconectado del servidor WebSocket');
+            });
+
+            socket.on('update-products', (products) => {
+                const productsList = document.getElementById('products-list');
+                productsList.innerHTML = '';
+                products.forEach(product => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'product-item';
+                    listItem.innerHTML = `<span>${product.name} - $${product.price}</span>
+                        <div class="product-actions">
+                            <a href="#" class="action-link" onclick="deleteProduct('${product._id}'); return false;">Eliminar</a>
+                            <a href="/products/${product._id}/edit" class="action-link">Modificar</a>
+                        </div>`;
+                    productsList.appendChild(listItem);
+                });
+            });
+
+            socket.on('new-product', (product) => {
+                const productsList = document.getElementById('products-list');
+                const listItem = document.createElement('li');
+                listItem.className = 'product-item';
+                listItem.innerHTML = `<span>${product.name} - $${product.price}</span>
+                    <div class="product-actions">
+                        <a href="#" class="action-link" onclick="deleteProduct('${product._id}'); return false;">Eliminar</a>
+                        <a href="/products/${product._id}/edit" class="action-link">Modificar</a>
+                    </div>`;
+                productsList.appendChild(listItem);
+            });
+
+            socket.on('delete-product', (productId) => {
+                const productsList = document.getElementById('products-list');
+                const productItems = productsList.getElementsByClassName('product-item');
+                for (let i = 0; i < productItems.length; i++) {
+                    if (productItems[i].querySelector('a').onclick.toString().includes(productId)) {
+                        productsList.removeChild(productItems[i]);
+                        break;
+                    }
+                }
+            });
+        });
+
+        function addProduct(event) {
+            event.preventDefault();
+            const product = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                category: document.getElementById('category').value,
+                price: parseFloat(document.getElementById('price').value),
+                stock: parseInt(document.getElementById('stock').value),
+            };
+
+            fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(product),
+            }).then(response => response.json())
+              .then(data => {
+                  console.log(data);
+                  document.getElementById('product-form').reset();  // Resetear el formulario
+                  socket.emit('new-product', data);
+              });
+        }
+
+        function deleteProduct(productId) {
+            fetch(`/api/products/${productId}`, {
+                method: 'DELETE'
+            }).then(response => response.json())
+              .then(data => {
+                  console.log(data);
+                  socket.emit('delete-product', productId);
+              });
+        }
+    </script>
+{{/layout}}

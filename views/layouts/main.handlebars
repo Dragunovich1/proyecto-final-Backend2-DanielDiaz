@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+            color: #333;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            max-width: 800px;
+            flex: 1;
+            margin-top: 70px;
+        }
+        .header {
+            background-color: #f8f8f8;
+            color: #333;
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8f8f8;
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+            z-index: 1000;
+        }
+        .nav .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .nav .links {
+            display: flex;
+            gap: 1rem;
+        }
+        .nav a {
+            text-decoration: none;
+            color: #333;
+            background-color: #e7e7e7;
+            padding: 0.5rem 1rem;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        .nav .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        .nav .auth-buttons button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .nav .auth-buttons button:hover {
+            background-color: #555;
+        }
+        footer {
+            background-color: #f8f8f8;
+            color: #333;
+            text-align: center;
+            padding: 1rem;
+            border-top: 1px solid #ddd;
+        }
+        button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        .product-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .product-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <div class="title">{{title}}</div>
+        <div class="links">
+            {{#if showDashboardLink}}
+                <a href="/">Volver al Dashboard</a>
+            {{else}}
+                <a href="/realtimeproducts">Agregar/modificar/eliminar Productos</a>
+                <a href="/carts/{{cartId}}">Ver Carrito Actual</a>
+            {{/if}}
+        </div>
+        <div class="auth-buttons">
+            {{#if user}}
+                <span>Bienvenido, {{user.first_name}}</span>
+                <form action="/api/auth/logout" method="POST" style="display:inline;">
+                    <button type="submit">Cerrar Sesión</button>
+                </form>
+            {{else}}
+                <a href="/login" class="login-btn">Iniciar Sesión</a>
+                <a href="/register" class="register-btn">Registrarse</a>
+            {{/if}}
+        </div>
+    </div>
+    <div class="container">
+        {{{body}}}
+    </div>
+    <footer>
+        <p>&copy; 2024 Proyecto Final CoderHouse Backend - Daniel Diaz</p>
+    </footer>
+</body>
+</html>
