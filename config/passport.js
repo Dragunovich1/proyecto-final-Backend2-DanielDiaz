@@ -34,7 +34,6 @@ passport.deserializeUser((id, done) => {
     });
 });
 
-passport.use(new GoogleStrategy({
 // Estrategia de Google
 /*passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
