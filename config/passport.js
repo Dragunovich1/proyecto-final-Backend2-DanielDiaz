@@ -34,8 +34,9 @@ passport.deserializeUser((id, done) => {
     });
 });
 
-// Estrategia de Google
 passport.use(new GoogleStrategy({
+// Estrategia de Google
+/*passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: '/api/auth/google/callback'
@@ -60,7 +61,7 @@ passport.use(new GoogleStrategy({
         return done(err, false);
     }
 }));
-
+*/
 
 // Estrategia de Facebook
 /* passport.use(new FacebookStrategy({
